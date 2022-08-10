@@ -18,10 +18,10 @@ func main() {
 	mux.HandleFunc("/", home)
 
 	// Use the http.ListenAndServe() function to start a new web server. We pass
-	// two parameters: the TCP network address to listen on (in this case :4000)
+	// two parameters: the TCP network address to listen on (in this case :3000)
 	// and the servemux we just created. If http.ListenAndServe() returns an error
 	// We use log.Fatal() function to log the error message and exit.
-	log.Println("Starting server on :4000")
-	err := http.ListenAndServe(":4000", mux)
+	log.Println("Starting server on :3000")
+	err := http.ListenAndServe(":3000", mux)
 	log.Fatal(err)
 }
