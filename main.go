@@ -26,6 +26,19 @@ func showSnippet(w http.ResponseWriter, r *http.Request) {
 
 // Add a createSnippet handler function
 func createSnippet(w http.ResponseWriter, r *http.Request) {
+	// Use r.Method to check whether the request is using POST or not.
+	// if it's not, use the w.WriteHeader() method to send a 405 status code and
+	// the w.Write() method to write a "Method Not Allowed" response body. We
+	// the return from the function so that subsequent code is not executed
+	if r.Method != "POST" {
+		// Use the Header().Set() method to add an 'Allow: POST' header to the
+		// response header map. The first parameter is the header name, and
+		// the second parameter is the header value.
+		w.Header().Set("Allow", "POST")
+		w.WriteHeader(405)
+		w.Write([]byte("Method Not Allowed"))
+		return
+	}
 	w.Write([]byte("Create a new snippet..."))
 }
 
