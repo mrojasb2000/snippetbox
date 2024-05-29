@@ -64,6 +64,7 @@ func main() {
 	// prefix it with the * symbol) before using it. Note that we're using the
 	// log.Printf
 	infoLog.Printf("Starting server on %s", *addr)
+	// Call the ListenAndServe() method on our new http.Server struct.
 	err := srv.ListenAndServe()
 	errorLog.Fatal(err)
 }
