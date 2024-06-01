@@ -3,7 +3,9 @@ package main
 import "net/http"
 
 // The routes() method returns a servemux containing our application routes.
-func (app *application) routes() *http.ServeMux {
+// Update the signature for the routes() method so that it returns a
+// http.Handler instead of *http.ServerMux.
+func (app *application) routes() http.Handler {
 	// Swap the route declarations to use application struct's methods as the
 	// handler functions.
 	mux := http.NewServeMux()
@@ -23,5 +25,5 @@ func (app *application) routes() *http.ServeMux {
 	mux.HandleFunc("/snippet/view", app.snippetView)
 	mux.HandleFunc("/snippet/create", app.snippetCreate)
 
-	return mux
+	return secureHeaders(mux)
 }
