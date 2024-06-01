@@ -75,21 +75,39 @@ func (app *application) snippetView(w http.ResponseWriter, r *http.Request) {
 // Add a new snippetCreate handler, which for now returns a placeholder
 // response. We'll update this shortly to show a HTML form.
 func (app *application) snippetCreate(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Display the form for creating a new snippet..."))
+	data := app.newTemplateData(r)
+	app.render(w, http.StatusOK, "create.tmpl", data)
 }
 
 // Change the signature of the snippetCreate handler so it is defined as a method
 // againt *application
 // Rename this handler to snippetCreatePost
 func (app *application) snippetCreatePost(w http.ResponseWriter, r *http.Request) {
-	// Checking if the request method is a POST is now superflow and can be
-	// removed, because this is done automatically by httprouter.
+	// First we call r.ParseForm() which adds any data in POST request bodies
+	// to the r.PostForm map. Thos also works in the same way for PUT and PATH
+	// requests. If there are may errors, we use our app.ClientError() helper to
+	// send a 400 Bad Request response to the user.
+	err := r.ParseForm()
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
-	// Create some variables holding dummy data. We'll these later on
-	// during the build.
-	title := "0 snail"
-	content := "0 snail\nClimb Mount Fuji,\nBut slowly, slowly!\n\n- Kobayashiy Issa"
-	expires := 7
+	// Use the r.PostForm.Get() method to retrieve the title and content
+	// from the r.PostForm map
+	title := r.PostForm.Get("title")
+	content := r.PostForm.Get("content")
+
+	// The r.PostForm.Get() method always returns the form data as a *string*
+	// However, we're expecting our expires value to be number, and want to
+	// represent it in our Go code as an integer. So we need to manually covert
+	// the form data to an integer using strconv.Atoi(), and we send a 400 Bad
+	// Request response if the conversion fails.
+	expires, err := strconv.Atoi(r.PostForm.Get("expires"))
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+		return
+	}
 
 	// Pass the data to the SnippetModel.Insert() method, received the
 	// ID of the new record back.
