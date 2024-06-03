@@ -7,12 +7,16 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
 	// Import the models package that we just created. You need to prefix this with
 	// wharever module path you set up back, so that import statement looks like this:
 	// "{your-module-path}/internal/models"
 	"snippetbox.example.org/internal/models"
 
+	"github.com/alexedwards/scs/mysqlstore"
+	"github.com/alexedwards/scs/v2"
+	"github.com/go-playground/form/v4"
 	_ "github.com/go-sql-driver/mysql"
 )
 
@@ -21,11 +25,15 @@ import (
 // we'll add more to it as the build progresses.
 // Add a snippet field tho the application struct. This will allow us to
 // make the SnippetModel object available to our handlers.
+// Add a formDecoder field to hold a pointer to a form.Decoder instance.
+// Add a new sessionManager field to the application struct.
 type application struct {
-	errorLog      *log.Logger
-	infoLog       *log.Logger
-	snippets      *models.SnippetModel
-	templateCache map[string]*template.Template
+	errorLog       *log.Logger
+	infoLog        *log.Logger
+	snippets       *models.SnippetModel
+	templateCache  map[string]*template.Template
+	formDecoder    *form.Decoder
+	sessionManager *scs.SessionManager
 }
 
 func main() {
@@ -74,16 +82,31 @@ func main() {
 		errorLog.Fatal(err)
 	}
 
+	// Initialize a decoder instance...
+	formDecoder := form.NewDecoder()
+
+	// Use the scs.New() function to initialize a new session manager. Then we
+	// configure it to use our MySQL databse as the session store, and set a
+	// lifetime of 12 hours (so that sessions automatically expire 12 hours
+	// after first being created).
+	sessionManager := scs.New()
+	sessionManager.Store = mysqlstore.New(db)
+	sessionManager.Lifetime = 12 * time.Hour
+
 	// Initialize a new instance of our application struct, containing the
 	// dependencies.
 	// Initialize a models.SnippetModel instance and add it to the application
 	// dependencies.
 	// Add a templateCache field to the application struct.
+	// And add it to the application dependencies.
+	// An add the session manager to our application dependencies.
 	app := &application{
-		errorLog:      errorLog,
-		infoLog:       infoLog,
-		snippets:      &models.SnippetModel{DB: db},
-		templateCache: templateCache,
+		errorLog:       errorLog,
+		infoLog:        infoLog,
+		snippets:       &models.SnippetModel{DB: db},
+		templateCache:  templateCache,
+		formDecoder:    formDecoder,
+		sessionManager: sessionManager,
 	}
 
 	// Initialize a new http.Server struct. We set the Addr and Handler fields so
