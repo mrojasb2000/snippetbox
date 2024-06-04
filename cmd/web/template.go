@@ -2,7 +2,6 @@ package main
 
 import (
 	"html/template"
-	"net/http"
 	"path/filepath"
 	"time"
 
@@ -35,15 +34,6 @@ func humanDate(t time.Time) string {
 // custom template functions and the functions themselves.
 var functions = template.FuncMap{
 	"humanDate": humanDate,
-}
-
-// Create an newTemplateData() helper, which returns a pointer to a templateData
-// struct initialize with the current year. Note that we're not using the
-// *http.Request parameter here at the moment, but we will do later in the book.
-func (app *application) newTemplateData(r *http.Request) *templateData {
-	return &templateData{
-		CurrentYear: time.Now().Year(),
-	}
 }
 
 func newTemplateCache() (map[string]*template.Template, error) {
