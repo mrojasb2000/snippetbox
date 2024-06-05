@@ -105,10 +105,18 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 // Create an newTemplateData() helper, which returns a pointer to a templateData
 // struct initialize with the current year. Note that we're not using the
 // *http.Request parameter here at the moment, but we will do later in the book.
+// Add the authenticated status to the template data.
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
 		// Add the flash message to the template data, if one exits.
-		Flash: app.sessionManager.PopString(r.Context(), "flash"),
+		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
+		IsAuthenticated: app.isAuthenticated(r),
 	}
+}
+
+// Return true if the current request is form an authenticated user, otherwise
+// return false.
+func (app *application) isAuthenticated(r *http.Request) bool {
+	return app.sessionManager.Exists(r.Context(), "authenticatedUserID")
 }
