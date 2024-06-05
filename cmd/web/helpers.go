@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/go-playground/form/v4"
+	"github.com/justinas/nosurf"
 )
 
 // The serverError helper writes an error message and stack trace to the errorLog,
@@ -106,12 +107,14 @@ func (app *application) decodePostForm(r *http.Request, dst any) error {
 // struct initialize with the current year. Note that we're not using the
 // *http.Request parameter here at the moment, but we will do later in the book.
 // Add the authenticated status to the template data.
+// Add the CSRF token.
 func (app *application) newTemplateData(r *http.Request) *templateData {
 	return &templateData{
 		CurrentYear: time.Now().Year(),
 		// Add the flash message to the template data, if one exits.
 		Flash:           app.sessionManager.PopString(r.Context(), "flash"),
 		IsAuthenticated: app.isAuthenticated(r),
+		CSRFToken:       nosurf.Token(r),
 	}
 }
 

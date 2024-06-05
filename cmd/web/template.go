@@ -16,6 +16,7 @@ import (
 // Include a Snippets field in the templateData struct.
 // Add a CurrentYear field to the templateData struct.
 // Add an IsAuthenticated field to the templateData struct.
+// Add a CSRFToken field.
 type templateData struct {
 	CurrentYear     int
 	Snippet         *models.Snippet
@@ -23,6 +24,7 @@ type templateData struct {
 	Form            any
 	Flash           string
 	IsAuthenticated bool
+	CSRFToken       string
 }
 
 // Create a humanDate function which returns a nicely formatted string
