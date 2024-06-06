@@ -36,7 +36,8 @@ func (app *application) routes() http.Handler {
 	// Alice provides a convenient way to chain your HTTP middleware functions
 	// and the app handler.
 	// Use the nosurf middleware on all our 'dynamic' routes.
-	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf)
+	// Add the authenticate() middleware to the chain.
+	dynamic := alice.New(app.sessionManager.LoadAndSave, noSurf, app.authenticate)
 
 	// Update these routes to use the new dynamic middleware chain followed by
 	// the appropiate handler function. Note that because the alice ThenFunc()
