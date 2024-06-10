@@ -86,6 +86,44 @@ func TestSnippetView(t *testing.T) {
 	}
 }
 
+func TestSnippetCreate(t *testing.T) {
+	app := newTestApplication(t)
+	ts := newTestServer(t, app.routes())
+	defer ts.Close()
+
+	t.Run("Unauthenticated", func(t *testing.T) {
+		code, headers, _ := ts.get(t, "/snippet/create")
+
+		assert.Equal(t, code, http.StatusSeeOther)
+
+		assert.Equal(t, headers.Get("Location"), "/user/login")
+	})
+
+	t.Run("Autheticated", func(t *testing.T) {
+		// Make a GET /user/login request a request and extract the CSRF tokeen from the
+		// response.
+		_, _, body := ts.get(t, "/user/login")
+		csrfToken := extractCSRFToken(t, body)
+
+		// Make a POST /user/login request using the extracted CSRF token and
+		// creadentials from our the mock user model
+		form := url.Values{}
+		form.Add("email", "alice@example.com")
+		form.Add("password", "pa$$word")
+		form.Add("csrf_token", csrfToken)
+		ts.postForm(t, "/user/login", form)
+
+		// Then check that teh authenticated user is shown the create snippet
+		// form.
+		code, _, body := ts.get(t, "/snippet/create")
+
+		assert.Equal(t, code, http.StatusOK)
+
+		assert.StringContains(t, body, "<form action='/snippet/create' method='POST'>")
+
+	})
+}
+
 func TestUserSignup(t *testing.T) {
 	// Create the application struct containing our mocked dependencies and set
 	// up the test server for running and end-to-end test.
