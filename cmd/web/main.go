@@ -37,6 +37,7 @@ type application struct {
 	templateCache  map[string]*template.Template
 	formDecoder    *form.Decoder
 	sessionManager *scs.SessionManager
+	debug          bool
 }
 
 func main() {
@@ -47,6 +48,9 @@ func main() {
 
 	// Define a new command-line flag for the MySQL DNS string.
 	dsn := flag.String("dsn", "web:pass@/snippetbox?parseTime=true", "MySQL data source name")
+
+	// Define a new command-line flasg for debug.
+	debug := flag.Bool("debug", false, "Enable debug mode")
 
 	// Importantly, we use the flag.Parse() function to parse the command-line flag.
 	// This reads in the command-line flag value and assigns it to the addr
@@ -109,6 +113,7 @@ func main() {
 	// Add a templateCache field to the application struct.
 	// And add it to the application dependencies.
 	// An add the session manager to our application dependencies.
+	// Add the debug flag value to the application struct.
 	app := &application{
 		errorLog:       errorLog,
 		infoLog:        infoLog,
@@ -117,6 +122,7 @@ func main() {
 		templateCache:  templateCache,
 		formDecoder:    formDecoder,
 		sessionManager: sessionManager,
+		debug:          *debug,
 	}
 
 	// Initialize a tls.config struct to hold the non-default TLS setting we
