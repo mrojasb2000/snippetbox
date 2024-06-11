@@ -5,20 +5,26 @@
    <h2>Account View</h2>
   </div>
   <div>
+    {{with .User}}
     <table>
         <tr>
           <td>Name</td>
-          <td>{{.User.Name}}</td>
+          <td>{{.Name}}</td>
         </tr>
         <tr>
           <td>Email</td>
-          <td>{{.User.Email}}</td>
+          <td>{{.Email}}</td>
         </tr>
         <tr>
           <td>Joined</td>
-          <td>{{humanDate .User.Created}}</td>
+          <td>{{humanDate .Created}}</td>
+        </tr>
+        <tr>
+          <td>Password</td>
+          <td><a href="/account/password/update">Change password</a></td>
         </tr>
     </table>
+    {{end}}
   </div>
 {{end}}
 
